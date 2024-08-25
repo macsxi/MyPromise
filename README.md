@@ -10,10 +10,10 @@
     * 如果状态是成功，则调用成功的回调函数
     * 如果状态是失败，则调用失败的回调函数
     
-## 实现Promise：
-### 一、实现简易版
+# 实现Promise：
+## 一、实现简易版
 
-#### 1. 新建`MyPromise`类，传入执行器`executor`
+### 1. 新建`MyPromise`类，传入执行器`executor`
 ```javascript
 class MyPromise {
   // 构造方法中接收一个执行器
@@ -23,7 +23,7 @@ class MyPromise {
   }
 }
 ```
-#### 2. `executor`传入`resolve`和`reject`
+### 2. `executor`传入`resolve`和`reject`
 ```javascript
 class MyPromise {
   // 构造方法中接收一个执行器
@@ -38,7 +38,7 @@ class MyPromise {
   reject = () => {}
 }
 ```
-#### 3. 状态与结果管理
+### 3. 状态与结果管理
 ```javascript
 // 定义三个全局变量
 const PENDING = 'pending';
@@ -79,7 +79,7 @@ class MyPromise {
   }
 }
 ```
-#### 4. `then`的简单实现
+### 4. `then`的简单实现
 ```js
 then = (onFulfilled, onRejected) => {
   // 判断状态
@@ -92,7 +92,7 @@ then = (onFulfilled, onRejected) => {
   }
 }
 ```
-#### 5. 使用`module.exports`导出`MyPromise`
+### 5. 使用`module.exports`导出`MyPromise`
 ```js
 module.exports = MyPromise;
 ```
@@ -112,7 +112,7 @@ promise.then(value => {
 // 运行结果：fulfilled success
 ```
 
-### 二. 加入异步逻辑
+## 二. 加入异步逻辑
 问题：上述简易版尚未实现异步逻辑，若有异步逻辑，则执行会有问题
 例如：
 ```js
@@ -136,7 +136,7 @@ promise.then(value => {
 解决：
 改造上述代码，处理`pending`状态。
 
-#### 1. 将成功和失败函数缓存起来
+### 1. 将成功和失败函数缓存起来
 ```js
   // 在MyPromise类中新增
   // 用于存储成功的回调
@@ -144,7 +144,7 @@ promise.then(value => {
   // 用于存储失败的回调
   onRejectedCallback = null;
 ```
-#### 2. `then`方法中新增`pending`的判断逻辑。
+### 2. `then`方法中新增`pending`的判断逻辑。
 ```js
 then = (onFulfilled, onRejected) => {
   // 判断状态
@@ -162,7 +162,7 @@ then = (onFulfilled, onRejected) => {
   }
 }
 ```
-#### 3. `resolve`和`reject`方法改造
+### 3. `resolve`和`reject`方法改造
 ```js
   // resolve和reject使用箭头函数，便于在调用时，方法的this指向当前实例，若是普通函数，则会指向window或undefined
   // 更改成功后的状态
@@ -209,7 +209,7 @@ promise.then(value => {
 });
 // 运行结果：等待1s，打印fulfilled success
 ```
-### 三、实现`then`方法多次调用添加多个处理函数
+## 三、实现`then`方法多次调用添加多个处理函数
 问题：`Promise`的`then`方法可以被多次调用，如果有多个`then`的调用，若是同步回调，则直接返回当前的值；若是异步回调，则保存多个成功和失败的回调函数，因为每个回调函数各不相同，需要用不同的值进行保存，前面的代码仍需改进。
 例如：
 ```js
@@ -244,14 +244,14 @@ promise.then(value => {
  * fulfilled success
  */
 ```
-#### 1. `MyPromise`类中新增两个数组
+### 1. `MyPromise`类中新增两个数组
 ```js
   // 用于存储成功的回调
   onFulfilledCallbacks = [];
   // 用于存储失败的回调
   onRejectedCallbacks = [];
 ```
-#### 2. `then`方法中将回调函数存入数组
+### 2. `then`方法中将回调函数存入数组
 ```js
   then = (onFulfilled, onRejected) => {
     // 判断状态
@@ -269,7 +269,7 @@ promise.then(value => {
     }
   }
 ```
-#### 3. `resolve`和`reject`方法改造
+### 3. `resolve`和`reject`方法改造
 ```js
   // 更改成功后的状态
   resolve = (value) => {
@@ -309,7 +309,7 @@ fulfilled success
 3
 fulfilled success
 ```
-### 四、实现`then`方法链式调用
+## 四、实现`then`方法链式调用
 分析：
     * `then`方法要实现链式调用，就需要返回一个`Promise`对象
     * `then`方法里返回一个值，作为下一个`then`方法的参数，如果返回一个`Promise`对象，就需要判断它的状态
@@ -336,7 +336,7 @@ promise.then(value => {
 
 // 执行报错
 ```
-#### 1. 修改`then`方法
+### 1. 修改`then`方法
 ```js
 class MyPromise {
   // ...
@@ -368,7 +368,7 @@ function resolvePromise(x, resolve, reject) {
   }
 }
 ```
-### 五、`then`方法链式调用识别`Promise`是否返回自己
+## 五、`then`方法链式调用识别`Promise`是否返回自己
 问题：
 若`then`方法返回的是自己的`Promise`对象，则会发循环调用，程序会报错。
 例如：
@@ -382,7 +382,7 @@ const op1 = oP.then(value => {
 })
 // 运行结果：报错  [TypeError: Chaining cycle detected for promise #<Promise>]
 ```
-#### 1. 改进`then`和`resolvePromise`方法
+### 1. 改进`then`和`resolvePromise`方法
 ```js
 {
   // ...
@@ -488,7 +488,7 @@ p.then(value => {
 ```
 原因分析：
 `then`方法中，需要等`thenPromise`初始化完成，才能调用`resolvePromise`，所以需要用一个微任务来执行这一部分逻辑。
-#### 2. 再次改进`then`方法
+### 2. 再次改进`then`方法
 ```js
   then = (onFulfilled, onRejected) => {
     const thenPromise = new MyPromise((resolve, reject) => {
@@ -518,8 +518,8 @@ fulfilled success
 3
 rejected TypeError: [TypeError: Chaining cycle detected for promise #<Promise>]
 ```
-### 六、错误捕获及`then`链式调用其他状态码补充
-#### 1. 捕获执行器错误
+## 六、错误捕获及`then`链式调用其他状态码补充
+### 1. 捕获执行器错误
 > 捕获执行器中的代码，如果执行器中的代码有错误，那么`Promise`的状态要变为`rejected`
 ```js
 class MyPromise {
@@ -551,7 +551,7 @@ const p = promise.then(value => {
 })
 // 运行结果：rejected Error: 执行器出错了
 ```
-#### 2. 捕获`then`执行时的错误
+### 2. 捕获`then`执行时的错误
 ```js
   then = (onFulfilled, onRejected) => {
     const thenPromise = new MyPromise((resolve, reject) => {
@@ -604,7 +604,7 @@ const p = promise.then(value => {
 fulfilled success
 rejected Error: then 执行出错了
 ```
-### 七、参考`fulfilled`下的状态处理，改造`rejected`和`pending`下的状态处理
+## 七、参考`fulfilled`下的状态处理，改造`rejected`和`pending`下的状态处理
 > 改造点：
 > 1. 增加异步状态下链式调用
 > 2. 增加回调函数执行结果判断
@@ -661,7 +661,7 @@ rejected Error: then 执行出错了
     return thenPromise;
   }
 ```
-### 八、`then`中的参数变为可选
+## 八、`then`中的参数变为可选
 原生的`Promise`中，`then`方法的`onResolve`和`onReject`可以单传，或者不传，都不影响执行，而且传入的`onResolve`和`onReject`若不是函数，则会被忽略。
 ```js
   then = (onFulfilled, onRejected) => {
@@ -694,7 +694,7 @@ const promise = new MyPromise((resolve, reject) => {
 promise.then().then().then(1, value => console.log(value))
 // 执行结果：error
 ```
-### 九、实现`resolve`和`reject`的静态调用
+## 九、实现`resolve`和`reject`的静态调用
 分析：原生`Promise`可以通过`Promise.resolve()`直接创建一个成功的`Promise`，而上述的`MyPromise`对象中没有此方法可以调用
 测试：
 ```js
@@ -712,12 +712,12 @@ MyPromise.resolve('aaa').then(value => {
 [Log] 1--> aaa
 [Log] 2--> bbb
 ```
-### 十、`Promise A+`测试
-#### 1. 安装
+## 十、`Promise A+`测试
+### 1. 安装
 ```js
 npm install promises-aplus-tests -D
 ```
-#### 2. 代码中加入deferred
+### 2. 代码中加入deferred
 ```js
 MyPromise.deferred = function () {
   var result = {};
@@ -728,7 +728,7 @@ MyPromise.deferred = function () {
   return result;
 }
 ```
-#### 3. 配置启动命令
+### 3. 配置启动命令
 ```json
 {
   "name": "promise",
@@ -749,8 +749,8 @@ MyPromise.deferred = function () {
 ```js
 npm run test
 ```
-### 十一、添加all、race、catch方法
-#### 1. all
+## 十一、添加all、race、catch方法
+### 1. all
 > 1. `Promise.all()`静态方法接受一个`Promise`可迭代对象作为输入，并返回一个`Promise`。
 > 2. 当所有输入的`Promise`都被兑现时，返回的`Promise`也将被兑现，兑现值是一个数组，其元素顺序与传入的 promise 一致。
 > 3. 如果输入的任何`Promise`被拒绝，则返回的`Promise`将被拒绝，并带有第一个被拒绝的原因。
@@ -785,7 +785,7 @@ npm run test
     })
   }
 ```
-#### 2. race
+### 2. race
 > `Promise.race()`静态方法接受一个`promise`可迭代对象作为输入，并返回一个`Promise`。这个返回的`promise`会随着第一个`promise`的敲定而敲定（即最快的`Promise`成功`Promise.race`就成功，最快的`Promise`失败`Promise.race`就失败）。
 ```js
   static race(promises) {
@@ -809,7 +809,7 @@ npm run test
     })
   }
 ```
-#### 3. catch
+### 3. catch
 > `catch`方法其实是`then`方法的语法糖
 ```js
 class MyPromise {
