@@ -103,6 +103,9 @@ class MyPromise {
     })
     return thenPromise;
   }
+  catch = onRejected => {
+    return this.then(null, onRejected);
+  }
   static resolve(params) {
     // 若传入Promise，则直接返回
     if (params instanceof MyPromise) {
@@ -115,6 +118,42 @@ class MyPromise {
   static reject(reason) {
     return new MyPromise((resolve, reject) => {
       reject(reason);
+    })
+  }
+  static all(promises) {
+    return new MyPromise((resolve, reject) => {
+      try {
+        let res = Array.from({ length: promises.length });
+        let resolveCount = 0;
+        for (let i = 0; i < promises.length; i++) {
+          MyPromise.resolve(promises[i]).then(value => {
+            resolveCount++;
+            res[i] = value;
+            if (resolveCount === promises.length) {
+              resolve(res);
+            }
+          }, reason => {
+            reject(reason);
+          });
+        }
+      } catch (error) {
+        reject(error);
+      }
+    })
+  }
+  static race(promises) {
+    return new MyPromise((resolve, reject) => {
+      try {
+        for (let i = 0; i < promises.length; i++) {
+          MyPromise.resolve(promises[i]).then(value => {
+            resolve(value);
+          }, reason => {
+            reject(reason);
+          })
+        }
+      } catch (error) {
+        reject(error);
+      }
     })
   }
 }
