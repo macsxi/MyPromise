@@ -121,22 +121,29 @@ class MyPromise {
     })
   }
   static all(promises) {
+    // 返回一个Promise
     return new MyPromise((resolve, reject) => {
       try {
         let res = Array.from({ length: promises.length });
+        // 用于记录已完成的Promise数
         let resolveCount = 0;
         for (let i = 0; i < promises.length; i++) {
+          // 用resolve包一层，兼容promises[i]不是Promise对象的情况
+          // 确保每个promises[i]都是已完成或已拒绝，所以在then方法中收集结果
           MyPromise.resolve(promises[i]).then(value => {
             resolveCount++;
             res[i] = value;
+            // 当已完成的Promise数等于promises项数时，表示全部Promise已完成，调用resolve并传入兑现值数组res
             if (resolveCount === promises.length) {
               resolve(res);
             }
           }, reason => {
+            // 当其中一个为已拒绝时，直接调用reject并传入当前拒绝原因
             reject(reason);
           });
         }
       } catch (error) {
+        // 若执行出错，则以错误为原因直接reject
         reject(error);
       }
     })
@@ -145,13 +152,18 @@ class MyPromise {
     return new MyPromise((resolve, reject) => {
       try {
         for (let i = 0; i < promises.length; i++) {
+          // 用resolve包一层，兼容promises[i]不是Promise对象的情况
+          // 确保promises[i]是已完成或已拒绝，所以在then方法中进行状态处理
           MyPromise.resolve(promises[i]).then(value => {
+            // 当前promise完成，则调用resolve，并传入当前兑现值
             resolve(value);
           }, reason => {
+            // 当前promise被拒绝时，直接调用reject并传入当前拒绝原因
             reject(reason);
           })
         }
       } catch (error) {
+        // 若执行出错，则以错误为原因直接reject
         reject(error);
       }
     })
